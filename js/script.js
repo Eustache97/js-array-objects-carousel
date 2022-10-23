@@ -23,21 +23,6 @@ const images = [
 ];
 const thumbsContainer = document.querySelector(".slider-container");
 
-//Con un ciclo for svolgiamo la funzione per creare la thumb e lo appendiamo in pagina
-images.forEach(element => {
-    const thumb = createthumb(images);  
-    thumb.innerHTML += ` <img src="${element.image}" alt="">`;
-    thumbsContainer.append(thumb);
-});
-//Prendiamo dal DOM gli elementi che ci servono
-const sliderThumb = document.querySelectorAll(".slider-item");
-console.log(sliderThumb);
-const sliderWrapper = document.querySelector(".slider-wrapper");
-console.log(sliderWrapper);
-const prevBtn = document.querySelector(".prev");
-const nextBtn = document.querySelector(".next");
-console.log(prevBtn, nextBtn);
-
 //Creiamo dinamicamente gli elementi per la descrizione dell'immagine corrente
 let descriptionDiv = document.createElement("div");
 descriptionDiv.classList.add("description");
@@ -45,34 +30,83 @@ const imageTitle = document.createElement("h3");
 console.log(imageTitle);
 const imageText = document.createElement("p");
 console.log(imageText);
+const sliderWrapper = document.querySelector(".slider-wrapper");
+console.log(sliderWrapper);
+/*Con un ciclo for svolgiamo la funzione per creare la thumb e quella per creare lo slider
+ e li appendiamo in pagina*/
+images.forEach(element => {
+    const thumb = createthumb();
+    const slider = createSlider();
+    thumb.innerHTML += ` <img src="${element.image}" alt="">`;
+    slider.innerHTML += `<img src="${element.image}" alt="">`;
+    thumbsContainer.append(thumb);
+    sliderWrapper.append(slider);
+});
+//Prendiamo dal DOM gli elementi che ci servono
+const containerThumb = document.querySelectorAll(".slider-item");
+console.log(containerThumb);
+const containerSlider = document.querySelectorAll(".slider");
+console.log(containerSlider);
+
+const prevBtn = document.querySelector(".prev");
+const nextBtn = document.querySelector(".next");
+console.log(prevBtn, nextBtn);
+
+
 
 //inizializziamo la posizione iniziale dell'active
 let activePosition = 0;
-sliderThumb[activePosition].classList.remove("obscured");
-sliderThumb[activePosition].classList.add("active");
-sliderWrapper.innerHTML = `<img src="${images[activePosition].image}" alt="">`;
+containerThumb[activePosition].classList.remove("obscured");
+containerThumb[activePosition].classList.add("active");
+containerSlider[activePosition].classList.remove("d-none");
+containerSlider[activePosition].classList.add("d-block");
+//Inizializziamo la descrizione del primo elemento 
 sliderWrapper.append(descriptionDiv);
 descriptionDiv.append(imageTitle);
 descriptionDiv.append(imageText);
 imageTitle.innerHTML = `${images[activePosition].title}`;
 imageText.innerHTML = `${images[activePosition].text}`;
-
+//andiamo a defire il click sui thumbs
+for(let i = 0; i < containerThumb.length; i++){
+        const thisThumb = containerThumb[i];
+        thisThumb.addEventListener("click", function() {
+            //Cancelliamo active  dal thumb e aggiungiamo obscured
+            containerThumb[activePosition].classList.remove("active");
+            containerThumb[activePosition].classList.add("obscured");
+            //calcelliamo d-block dallo slider e aggiungiamo d-none
+            containerSlider[activePosition].classList.remove("d-block");
+            containerSlider[activePosition].classList.add("d-none");
+    
+            // Aggiorniamo la posizione attuale
+            activePosition = i;
+    
+            // Aggiungere active e rimuoviamo obscured alla nuova posizione del thumb
+            containerThumb[activePosition].classList.add("active");
+            containerThumb[activePosition].classList.remove("obscured");
+            // Aggiungere d-block e rimuoviamo d-none alla nuova posizione dello slider
+            containerSlider[activePosition].classList.add("d-block");
+            containerSlider[activePosition].classList.remove("d-none");
+            //modifichiamo la descrizione dell'immagine
+            imageTitle.innerHTML = `${images[activePosition].title}`;
+            imageText.innerHTML = `${images[activePosition].text}`;
+        });
+};
 //Al click del bottone next
 nextBtn.addEventListener("click", function(){
     
-   mouveNextActiveAndChangeDescription(sliderThumb, images, imageTitle, imageText, sliderWrapper);
+   mouveNextActiveAndChangeDescription(containerThumb, containerSlider, images, imageTitle, imageText, sliderWrapper);
   
 })
 
 //Al click de  bottone prev
 prevBtn.addEventListener("click", function(){
     
-    mouvePrevActiveAndChangeDescription(sliderThumb, images, imageTitle, imageText, sliderWrapper);
+    mouvePrevActiveAndChangeDescription(containerThumb, containerSlider,images, imageTitle, imageText);
    
  })
 
 //funzione per creare una thumb
-function createthumb(array){
+function createthumb(){
     //Creiamo l'elemento div
     const thumb = document.createElement("div");
     //Gli aggiungiamo le classi slide-item e obscured
@@ -80,15 +114,26 @@ function createthumb(array){
     thumb.classList.add("obscured");
     return thumb;   
 }
+function createSlider(){
+    //Creiamo l'elemento div
+    const slider = document.createElement("div");
+    //Gli aggiungiamo la classe slider
+    slider.classList.add("slider");
+    slider.classList.add("d-none");
+    return slider;   
+}
 //funzione per gestire l'active su nextBtn
-function mouveNextActiveAndChangeDescription(array,array1, htmlElement1, htmlElement2,wrapper){
+function mouveNextActiveAndChangeDescription(array,array1,array2, htmlElement1, htmlElement2){
     
    
     //Se la posizione attuale è minore della lunghezza dell' array
     if(activePosition < array.length){
-        //rimuoviamo la classe active aggiungiamo obscured nella nuova attuale posizione
+        //rimuoviamo la classe active aggiungiamo obscured 
         array[activePosition].classList.remove("active");
         array[activePosition].classList.add("obscured");
+        //rimuoviamo la classe d-block aggiungiamo d-none 
+        array1[activePosition].classList.remove("d-block");
+        array1[activePosition].classList.add("d-none");
 
         //Inscrementiamo di posizione
         activePosition++;
@@ -98,24 +143,21 @@ function mouveNextActiveAndChangeDescription(array,array1, htmlElement1, htmlEle
         activePosition = 0;
         }
 
-        //rimuoviamo la classe hidden aggiungiamo active nell nuova attuale posizione
+        //rimuoviamo la classe obscured aggiungiamo active nella nuova attuale posizione
         array[activePosition].classList.remove("obscured");
         array[activePosition].classList.add("active");
-        //inseriamo in pagina  l'immagine corrente
-        wrapper.innerHTML = `<img src="${array1[activePosition].image}" alt="">`;
-        //appendiamo in seguito il div per la descrizione
-        wrapper.append(descriptionDiv);
-        //in cui appendiamo gli elementi semantici
-        descriptionDiv.append(htmlElement1);
-        descriptionDiv.append(htmlElement2);
-        //all'inteno dei quali andiamo a scrivere as sua volta il titolo e la descrizionr corrispondente
-        htmlElement1.innerHTML = `${array1[activePosition].title}`;
-        htmlElement2.innerHTML = `${array1[activePosition].text}`;
+        //rimuoviamo la classe d-none aggiungiamo dblock nella nuova attuale posizione
+        array1[activePosition].classList.remove("d-none");
+        array1[activePosition].classList.add("d-block");
+        
+        //all'inteno degli elementi di descrizione andiamo a scrivere a sua volta il titolo e la descrizione corrispondente
+        htmlElement1.innerHTML = `${array2[activePosition].title}`;
+        htmlElement2.innerHTML = `${array2[activePosition].text}`;
     }
 }
 
 //funzione per gestire l'active su prevBtn
-function mouvePrevActiveAndChangeDescription(array,array1, htmlElement1, htmlElement2,wrapper){
+function mouvePrevActiveAndChangeDescription(array,array1,array2, htmlElement1, htmlElement2){
     
    
      //Se la posizione attuale è maggiore uguale di 0
@@ -123,6 +165,9 @@ function mouvePrevActiveAndChangeDescription(array,array1, htmlElement1, htmlEle
         //rimuoviamo la classe active e aggiungiamo obscured
         array[activePosition].classList.remove("active");
         array[activePosition].classList.add("obscured");
+        //rimuoviamo la classe d-block aggiungiamo d-none
+        array1[activePosition].classList.remove("d-block");
+        array1[activePosition].classList.add("d-none");
 
         // se la posizione attuale è ugualè a 0  lo riinizializziamo alla lunghezza dell' array
         if(activePosition == 0){
@@ -136,16 +181,14 @@ function mouvePrevActiveAndChangeDescription(array,array1, htmlElement1, htmlEle
         //rimuoviamo la classe hidden aggiungiamo active nell nuova attuale posizione
         array[activePosition].classList.remove("obscured");
         array[activePosition].classList.add("active");
-        //inseriamo in pagina  l'immagine corrente
-        wrapper.innerHTML = `<img src="${array1[activePosition].image}" alt="">`;
-        //appendiamo in seguito il div per la descrizione
-        wrapper.append(descriptionDiv);
-        //in cui appendiamo gli elementi semantici
-        descriptionDiv.append(htmlElement1);
-        descriptionDiv.append(htmlElement2);
+        //rimuoviamo la classe d-none aggiungiamo dblock nella nuova attuale posizione
+        array1[activePosition].classList.remove("d-none");
+        array1[activePosition].classList.add("d-block");
+
+        
         //all'inteno dei quali andiamo a scrivere as sua volta il titolo e la descrizionr corrispondente
-        htmlElement1.innerHTML = `${array1[activePosition].title}`;
-        htmlElement2.innerHTML = `${array1[activePosition].text}`;
+        htmlElement1.innerHTML = `${array2[activePosition].title}`;
+        htmlElement2.innerHTML = `${array2[activePosition].text}`;
     }
 }
     
