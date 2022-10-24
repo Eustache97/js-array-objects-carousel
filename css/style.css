@@ -70,8 +70,13 @@ img{
 .prev:hover{
     background-color:  rgba(240, 240, 240, 1);
 }
+.autoplay-buttons{
+    display: flex;
+    justify-content: center;
+}
 #invert,
-#start-stop{
+#start,
+#stop{
     background-color: #2626f2;
     border: unset;
     margin-top: 1em;
@@ -80,6 +85,7 @@ img{
     border-radius: 5px;
 }
 #invert:hover,
-#start-stop:hover{
+#start:hover,
+#stop:hover{
     opacity: .9;
 }

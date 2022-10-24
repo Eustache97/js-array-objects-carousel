@@ -52,6 +52,13 @@ const prevBtn = document.querySelector(".prev");
 const nextBtn = document.querySelector(".next");
 console.log(prevBtn, nextBtn);
 
+const invertAutoplayBtn = document.getElementById("invert");
+const startAutoplayBtn = document.getElementById("start");
+const stopAutoplayBtn = document.getElementById("stop");
+stopAutoplayBtn.classList.add("d-none");
+console.log(invertAutoplayBtn, startAutoplayBtn, stopAutoplayBtn);
+
+
 
 
 //inizializziamo la posizione iniziale dell'active
@@ -80,10 +87,10 @@ for(let i = 0; i < containerThumb.length; i++){
             // Aggiorniamo la posizione attuale
             activePosition = i;
     
-            // Aggiungere active e rimuoviamo obscured alla nuova posizione del thumb
+            // Aggiungeriamo active e rimuoviamo obscured alla nuova posizione del thumb
             containerThumb[activePosition].classList.add("active");
             containerThumb[activePosition].classList.remove("obscured");
-            // Aggiungere d-block e rimuoviamo d-none alla nuova posizione dello slider
+            // Aggiungeriamo d-block e rimuoviamo d-none alla nuova posizione dello slider
             containerSlider[activePosition].classList.add("d-block");
             containerSlider[activePosition].classList.remove("d-none");
             //modifichiamo la descrizione dell'immagine
@@ -104,6 +111,44 @@ prevBtn.addEventListener("click", function(){
     mouvePrevActiveAndChangeDescription(containerThumb, containerSlider,images, imageTitle, imageText);
    
  })
+//Gestione click startautoplay
+let myAutoPlay = "";
+let myAutoPlayInverted = "";
+//al click
+startAutoplayBtn.addEventListener("click", function(){
+    //nascondiamo il bottone
+    this.classList.add("d-none");
+    //rimuoviamo il display none e mostriamo il bottone stopautoplay
+    stopAutoplayBtn.classList.remove("d-none");
+    stopAutoplayBtn.classList.add("d-block");
+    //ogni 3 secodi eseguiamo la funzione autoplay
+    myAutoPlay = setInterval(autoplay, 3000) ;
+});
+//Al click del bottone invertAutoplay
+invertAutoplayBtn.addEventListener("click", function(){
+    //annulliamo la funzione autoplay
+    clearInterval(myAutoPlay);
+    //rimuoviamo il display block e nascondiamo il bottone startAutoplay 
+    startAutoplayBtn.classList.remove("d-block");
+    startAutoplayBtn.classList.add("d-none");
+    //rimuoviamo il display none e mostriamo il bottone stopautoplay
+    stopAutoplayBtn.classList.remove("d-none");
+    stopAutoplayBtn.classList.add("d-block");
+    //ogni 3 secodi eseguiamo la funzione autoplayInvert
+    myAutoPlayInverted = setInterval(autoplayInvert, 3000)
+})
+//Al click del bottone stopAutoplay
+stopAutoplayBtn.addEventListener("click", function(){
+    //Nascondiamo il bottone
+    this.classList.add("d-none");
+    //rimuoviamo il display none e mostriamo il bottone startAutoplay
+    startAutoplayBtn.classList.remove("d-none");
+    startAutoplayBtn.classList.add("d-block");
+    //annulliamo la funzione autoplay e la funzione autoplayInvert
+    clearInterval(myAutoPlay);
+    clearInterval(myAutoPlayInverted);
+});
+
 
 //funzione per creare una thumb
 function createthumb(){
@@ -191,4 +236,54 @@ function mouvePrevActiveAndChangeDescription(array,array1,array2, htmlElement1, 
         htmlElement2.innerHTML = `${array2[activePosition].text}`;
     }
 }
-    
+function autoplay(){
+    if( activePosition < containerThumb.length){
+
+            //Cancelliamo active  dal thumb e aggiungiamo obscured
+            containerThumb[activePosition].classList.remove("active");
+            containerThumb[activePosition].classList.add("obscured");
+            //calcelliamo d-block dallo slider e aggiungiamo d-none
+            containerSlider[activePosition].classList.remove("d-block");
+            containerSlider[activePosition].classList.add("d-none");
+            activePosition++;
+            if(activePosition == containerThumb.length){
+                activePosition = 0;
+                }
+            // Aggiungere active e rimuoviamo obscured alla nuova posizione del thumb
+            containerThumb[activePosition].classList.add("active");
+            containerThumb[activePosition].classList.remove("obscured");
+            // Aggiungere d-block e rimuoviamo d-none alla nuova posizione dello slider
+            containerSlider[activePosition].classList.add("d-block");
+            containerSlider[activePosition].classList.remove("d-none");
+            //modifichiamo la descrizione dell'immagine
+            imageTitle.innerHTML = `${images[activePosition].title}`;
+            imageText.innerHTML = `${images[activePosition].text}`;
+    }
+}
+
+function autoplayInvert(){
+    if( activePosition >= 0){
+
+            //Cancelliamo active  dal thumb e aggiungiamo obscured
+            containerThumb[activePosition].classList.remove("active");
+            containerThumb[activePosition].classList.add("obscured");
+            //calcelliamo d-block dallo slider e aggiungiamo d-none
+            containerSlider[activePosition].classList.remove("d-block");
+            containerSlider[activePosition].classList.add("d-none");
+
+            if(activePosition == 0){
+                activePosition = containerThumb.length;
+                }
+            activePosition--;
+            // Aggiungere active e rimuoviamo obscured alla nuova posizione del thumb
+            containerThumb[activePosition].classList.add("active");
+            containerThumb[activePosition].classList.remove("obscured");
+            // Aggiungere d-block e rimuoviamo d-none alla nuova posizione dello slider
+            containerSlider[activePosition].classList.add("d-block");
+            containerSlider[activePosition].classList.remove("d-none");
+            //modifichiamo la descrizione dell'immagine
+            imageTitle.innerHTML = `${images[activePosition].title}`;
+            imageText.innerHTML = `${images[activePosition].text}`;
+    }
+}
+
